@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScriptExchange — Trade & Escrow Hub</title>
+  <style>
+    :root {
+      --bg-main: #0B0E14;
+      --bg-card: #151A23;
+      --bg-card-hover: #1E2532;
+      --accent-blue: #0088FF;
+      --accent-cyan: #00F0FF;
+      --accent-green: #00FF87;
+      --accent-orange: #FF9900;
+      --accent-red: #FF4757;
+      --text-primary: #F0F4F8;
+      --text-secondary: #94A3B8;
+      --border-color: #2A3447;
+      --border-glow: rgba(0, 240, 255, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Roboto, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(0, 136, 255, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(0, 240, 255, 0.05) 0%, transparent 40%);
+    }
+
+    /* HEADER */
+    header {
+      background: rgba(21, 26, 35, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      background: linear-gradient(135deg, #FFF 30%, var(--accent-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-tag {
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-stats {
+      display: flex;
+      gap: 20px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .stat-item span {
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+
+    /* LAYOUT */
+    .container {
+      max-width: 1200px;
+      margin: 32px auto;
+      padding: 0 16px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* CATALOG SECTION */
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 16px;
+      background: var(--accent-cyan);
+      border-radius: 2px;
+    }
+
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .script-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .script-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent-cyan);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 15px var(--border-glow);
+    }
+
+    .game-badge {
+      align-self: flex-start;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .badge-mm2 { background: rgba(255, 71, 87, 0.15); color: var(--accent-red); border: 1px solid rgba(255, 71, 87, 0.3); }
+    .badge-adopt { background: rgba(0, 255, 135, 0.15); color: var(--accent-green); border: 1px solid rgba(0, 255, 135, 0.3); }
+
+    .script-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      line-height: 1.3;
+    }
+
+    .script-seller {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    .price-box {
+      background: rgba(11, 14, 20, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 16px;
+    }
+
+    .price-label {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    .price-value {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--accent-cyan);
+      margin-top: 2px;
+    }
+
+    .btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent-blue), #0055FF);
+      color: #FFF;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn:hover {
+      filter: brightness(1.2);
+      box-shadow: 0 0 12px rgba(0, 136, 255, 0.5);
+    }
+
+    .btn-admin {
+      background: linear-gradient(135deg, var(--accent-orange), #FF6600);
+      margin-top: 10px;
+    }
+
+    /* DASHBOARD / ESCROW PANEL */
+    .escrow-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      height: fit-content;
+      position: sticky;
+      top: 90px;
+    }
+
+    .panel-header {
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-pill {
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .status-idle { background: rgba(148, 163, 184, 0.1); color: var(--text-secondary); }
+    .status-pending { background: rgba(255, 153, 0, 0.15); color: var(--accent-orange); border: 1px solid rgba(255, 153, 0, 0.3); }
+    .status-paid { background: rgba(0, 255, 135, 0.15); color: var(--accent-green); border: 1px solid rgba(0, 255, 135, 0.3); }
+
+    .deal-info-item {
+      margin-bottom: 12px;
+      font-size: 0.85rem;
+    }
+
+    .deal-info-label {
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      margin-bottom: 2px;
+    }
+
+    .deal-info-val {
+      font-weight: 600;
+    }
+
+    .fee-notice {
+      background: rgba(0, 136, 255, 0.08);
+      border: 1px dashed var(--accent-blue);
+      border-radius: 8px;
+      padding: 10px;
+      margin: 16px 0;
+      font-size: 0.8rem;
+      color: #A0C4FF;
+      line-height: 1.4;
+    }
+
+    .result-box {
+      background: #080B10;
+      border: 1px solid var(--accent-green);
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 16px;
+      display: none;
+    }
+
+    .result-box code {
+      display: block;
+      background: #111622;
+      padding: 8px;
+      border-radius: 4px;
+      color: var(--accent-green);
+      font-family: monospace;
+      font-size: 0.8rem;
+      margin-top: 8px;
+      word-break: break-all;
+    }
+
+    .sim-controls {
+      margin-top: 24px;
+      border-top: 1px dashed var(--border-color);
+      padding-top: 16px;
+    }
+
+    .sim-title {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">
+      SCRIPTEXHUB <span class="logo-tag">DEMO ESCROW</span>
+    </div>
+    <div class="nav-stats">
+      <div class="stat-item">Гарант Онлайн: <span>АКТИВЕН</span></div>
+      <div class="stat-item">Фикс. Комиссия: <span>3 предмета</span></div>
+    </div>
+  </header>
+
+  <div class="container">
+    
+    <!-- LEFT COLUMN: CATALOG -->
+    <div>
+      <div class="section-title">Доступные Скрипты</div>
+      <div class="catalog-grid" id="catalog">
+        <!-- JS динамически заполнит товары -->
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: ACTIVE ESCROW / TRADE PANEL -->
+    <div class="escrow-panel">
+      <div class="panel-header">
+        <h3 style="font-size: 1rem;">Комната Сделки</h3>
+        <span id="dealStatus" class="status-pill status-idle">Нет сделки</span>
+      </div>
+
+      <div id="escrowBody">
+        <p style="font-size: 0.85rem; color: var(--text-secondary); text-align: center; padding: 20px 0;">
+          Выберите скрипт из каталога слева, чтобы начать оформление обмена.
+        </p>
+      </div>
+
+      <!-- АДМИН ПАНЕЛЬ (Симуляция подтверждения от тебя) -->
+      <div class="sim-controls" id="adminPanel" style="display: none;">
+        <div class="sim-title">Панель Гаранта (Стримера):</div>
+        <button class="btn btn-admin" onclick="simulatePaymentConfirm()">[АДМИН] Подтвердить получение предметов</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Тестовые данные скриптов
+    const scriptsData = [
+      {
+        id: 1,
+        game: 'MM2',
+        gameClass: 'badge-mm2',
+        title: 'Auto-Farm & Coin Collector',
+        seller: 'RobloxScripter_99',
+        price: '1 Godly Weapon',
+        scriptUrl: 'loadstring(game:HttpGet("https://raw.githubusercontent.com/demo/mm2/main.lua"))()'
+      },
+      {
+        id: 2,
+        game: 'Adopt Me',
+        gameClass: 'badge-adopt',
+        title: 'Auto-Baby Raise & Money Bot',
+        seller: 'PetTraderPro',
+        price: '1 Legendary Pet',
+        scriptUrl: 'loadstring(game:HttpGet("https://raw.githubusercontent.com/demo/adoptme/main.lua"))()'
+      },
+      {
+        id: 3,
+        game: 'MM2',
+        gameClass: 'badge-mm2',
+        title: 'Silent Aimbot + ESP Sheriff',
+        seller: 'DarkLuau_Dev',
+        price: '2 Ancient Items',
+        scriptUrl: 'loadstring(game:HttpGet("https://raw.githubusercontent.com/demo/esp/main.lua"))()'
+      }
+    ];
+
+    let currentDeal = null;
+
+    // Рендер каталога
+    function renderCatalog() {
+      const catalogEl = document.getElementById('catalog');
+      catalogEl.innerHTML = scriptsData.map(item => `
+        <div class="script-card">
+          <div>
+            <span class="game-badge ${item.gameClass}">${item.game}</span>
+            <div class="script-title">${item.title}</div>
+            <div class="script-seller">Продавец: <b>${item.seller}</b></div>
+          </div>
+          <div>
+            <div class="price-box">
+              <div class="price-label">Цена продавца</div>
+              <div class="price-value">${item.price}</div>
+            </div>
+            <button class="btn" onclick="startDeal(${item.id})">Купить через Гаранта</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Старт сделки
+    function startDeal(scriptId) {
+      const item = scriptsData.find(s => s.id === scriptId);
+      currentDeal = {
+        ...item,
+        status: 'pending',
+        tradeId: 'TR-' + Math.floor(1000 + Math.random() * 9000)
+      };
+
+      updateEscrowUI();
+    }
+
+    // Обновление UI Сделки
+    function updateEscrowUI() {
+      const statusEl = document.getElementById('dealStatus');
+      const bodyEl = document.getElementById('escrowBody');
+      const adminEl = document.getElementById('adminPanel');
+
+      if (!currentDeal) return;
+
+      if (currentDeal.status === 'pending') {
+        statusEl.className = 'status-pill status-pending';
+        statusEl.innerText = 'Ожидание Оплаты';
+        adminEl.style.display = 'block';
+
+        bodyEl.innerHTML = `
+          <div class="deal-info-item">
+            <div class="deal-info-label">ID Сделки</div>
+            <div class="deal-info-val" style="color: var(--accent-cyan);">${currentDeal.tradeId}</div>
+          </div>
+          <div class="deal-info-item">
+            <div class="deal-info-label">Товар</div>
+            <div class="deal-info-val">${currentDeal.title}</div>
+          </div>
+          <div class="deal-info-item">
+            <div class="deal-info-label">К передаче гарантированно:</div>
+            <div class="deal-info-val">${currentDeal.price} + 3 предмета (комиссия)</div>
+          </div>
+
+          <div class="fee-notice">
+            📌 <b>Инструкция для покупателя:</b><br>
+            Зайдите на стрим / в игру к Гаранту и передайте указанный товар вместе с комиссией (3 комонки/любых предмета).
+          </div>
+        `;
+      } else if (currentDeal.status === 'paid') {
+        statusEl.className = 'status-pill status-paid';
+        statusEl.innerText = 'Успешно Оплачено';
+        adminEl.style.display = 'none';
+
+        bodyEl.innerHTML = `
+          <div class="deal-info-item">
+            <div class="deal-info-label">Статус</div>
+            <div class="deal-info-val" style="color: var(--accent-green);">Предметы получены Гарантом</div>
+          </div>
+          
+          <div class="result-box" style="display: block;">
+            <div style="font-size: 0.8rem; font-weight: 700; color: #FFF;">Ваш Скрипт / Loader:</div>
+            <code>${currentDeal.scriptUrl}</code>
+            <button class="btn" style="margin-top: 10px; background: var(--border-color);" onclick="navigator.clipboard.writeText('${currentDeal.scriptUrl}')">Скопировать код</button>
+          </div>
+        `;
+      }
+    }
+
+    // Симуляция клика Гаранта (Стримера)
+    function simulatePaymentConfirm() {
+      if (currentDeal) {
+        currentDeal.status = 'paid';
+        updateEscrowUI();
+      }
+    }
+
+    // Инициализация при загрузке
+    renderCatalog();
+  </script>
+</body>
+</html>
+
